@@ -1,0 +1,22 @@
+{
+  "name": "mssql-console",
+  "version": "1.0.0",
+  "description": "console application to access to SQL Server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cavitkeskin/mssql-console.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cavitkeskin/mssql-console/issues"
+  },
+  "homepage": "https://github.com/cavitkeskin/mssql-console#readme",
+  "dependencies": {
+    "mssql": "^2.3.2"
+  }
+}
