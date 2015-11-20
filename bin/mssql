@@ -1,0 +1,11 @@
+#!/bin/sh
+
+WHEREAMI=$(dirname $0)
+
+/usr/local/bin/node $WHEREAMI/../index.js -h db.aesny.org -u sa -p 9867seA "$@"
+
+
+
+
+
+
