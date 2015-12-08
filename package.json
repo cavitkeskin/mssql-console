@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/cavitkeskin/mssql-console#readme",
   "dependencies": {
-    "mssql": "^2.3.2"
+    "async": "^1.5.0",
+    "mssql": "^2.3.2",
+    "underscore": "^1.8.3"
   }
 }

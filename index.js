@@ -1,6 +1,8 @@
 var mssql = require('mssql'),
 	async = require('async'),
-	fs = require('fs');
+	fs = require('fs'),
+    _ = require('underscore'),
+    util = require('util');    
 
 
 //console.log(process.argv)
@@ -45,6 +47,8 @@ for(var i = 2; i < args.length; i++){
 	
 */
 
+
+
 //console.log({
 //	host: host,
 //	database: database,
@@ -53,6 +57,56 @@ for(var i = 2; i < args.length; i++){
 //	sqlfile: sqlfile,
 //	statement: statement
 //})
+
+
+// ***************************************************************
+
+
+
+function printTable(data){
+    
+    var keys = _.object(_.keys(data[0]), []),
+        maxwidth = 30;
+    
+    _.each(data, function(item){
+        _.each(item, function(v, k){
+            var l = String(v).trim().length; if(l>maxwidth) l = maxwidth;
+            if(typeof keys[k] === 'undefined') keys[k] = k.length+1;
+            keys[k] = l > keys[k] ? l : keys[k];
+            
+             //   // to find the total length of the GUI
+             //   if (_.keys.length > 0) {    
+             //   var sumKeys = 12 + (select count(*) from information_schema.columns where table_name='article')
+             //       console.log(sumKeys)
+             //   }
+        })
+    });
+    
+    console.log(keys);
+    
+    
+    _.each(keys, function(l, k){
+        var label = k;
+        while(label.length <= l) label += ' ';
+        process.stdout.write("\x1b[4m"+label+'\x1b[0m');
+    })
+    process.stdout.write("\n");
+    _.each(data, function(item){
+        _.each(item, function(v, k){
+            var s = String(v).trim().replace(/\n/g, ' ');
+            if(s.length > maxwidth){
+                s = s.substring(0, maxwidth-3)+'...';
+            }
+            while(s.length <= keys[k]) s += ' ';
+            process.stdout.write(s);    
+        })
+        process.stdout.write("\n");
+    })
+    
+} 
+
+
+// ***************************************************************
 
 
 
@@ -68,7 +122,7 @@ function query(sql){
 	return function(callback){
 		console.log('query '+sql);
 		db.query(sql, function(err, result){
-			if(!err) console.log(result);
+			if(!err) printTable(result);
 			callback(err, null);
 		});
 	}
@@ -94,27 +148,30 @@ var JOBS = [
 	// connect to server
 	function(callback){
 		conn = new mssql.Connection({user: username, password: password, server: host}, callback);
-		
 	}
 ];
 
+function setJobs(){
+    database.forEach(function(dbname){
+        JOBS.push(selectdb(dbname));
 
-database.forEach(function(dbname){
-	JOBS.push(selectdb(dbname));
+        sqlfile.forEach(function(file){
+            JOBS.push(execute(file));
+        })
 
-	sqlfile.forEach(function(file){
-		JOBS.push(execute(file));
-	})
-	
-	statement.forEach(function(sql){
-		JOBS.push(query(sql));
-	})
-	
-})
+        statement.forEach(function(sql){
+            JOBS.push(query(sql));
+        })
 
+    })
+}
+
+
+
+
+setJobs();
 
 async.series(JOBS, function(err, result){
-	conn.close();
-	if(err) throw err;
+    conn.close();
+    if(err) throw err;
 })
-

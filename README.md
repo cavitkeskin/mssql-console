@@ -18,3 +18,4 @@ to run on all databases
 
 	mssql -h host -u username -p password filename.sql [file ...]
 
+mssql-console Desktop$ bin/mssql -d VACS ~/projects/SIS/SQL/REPORTS/IDCARD_VACS.sql
