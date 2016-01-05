@@ -82,26 +82,33 @@ function printTable(data){
         })
     });
     
-    console.log(keys);
+    //console.log(keys);
     
+    process.stdout.write("\n");
     
     _.each(keys, function(l, k){
         var label = k;
         while(label.length <= l) label += ' ';
-        process.stdout.write("\x1b[4m"+label+'\x1b[0m');
+        process.stdout.write("\x1b[4m"+'｜ '+label+'\x1b[0m');
     })
+    process.stdout.write("\n");
     process.stdout.write("\n");
     _.each(data, function(item){
         _.each(item, function(v, k){
             var s = String(v).trim().replace(/\n/g, ' ');
             if(s.length > maxwidth){
-                s = s.substring(0, maxwidth-3)+'...';
+                s = s.substring(0, maxwidth-5)+'...';
             }
             while(s.length <= keys[k]) s += ' ';
-            process.stdout.write(s);    
+            process.stdout.write('｜ '+s);    
         })
-        process.stdout.write("\n");
-    })
+        process.stdout.write('｜'+"\n");
+    });
+    
+    var cd = 145  // should be dynamic
+    process.stdout.write(Array(cd).join("‾")+"\n");
+    process.stdout.write("\n");
+    
     
 } 
 
