@@ -14,7 +14,8 @@ var database = [],
 	username = '',
 	password = '',
 	sqlfile = [],
-	statement = [];
+	statement = [],
+    maxwidth = 30;
 
 for(var i = 2; i < args.length; i++){
 	switch(args[i]){
@@ -32,6 +33,9 @@ for(var i = 2; i < args.length; i++){
 			break;
 		case '-c':
 			statement.push(args[++i]);
+			break;
+		case '--max-width':
+			maxwidth = args[++i];
 			break;
 		default:
 			sqlfile.push(args[i]);
@@ -65,8 +69,7 @@ for(var i = 2; i < args.length; i++){
 
 function printTable(data){
     
-    var keys = _.object(_.keys(data[0]), []),
-        maxwidth = 30;
+    var keys = _.object(_.keys(data[0]), []);
     
     _.each(data, function(item){
         _.each(item, function(v, k){
@@ -86,17 +89,41 @@ function printTable(data){
     
     process.stdout.write("\n");
     
+    // header line
+     _.each(keys, function(l){
+        var s = '';
+        while(s.length <= l) s += '‾';
+            process.stdout.write('‾‾‾'+s);
+    }); 
+    process.stdout.write("‾"); 
+    
+    process.stdout.write("\n");
+    process.stdout.write("\n");
+    process.stdout.write("\n");
+    process.stdout.write("\n");
     _.each(keys, function(l, k){
         var label = k;
         while(label.length <= l) label += ' ';
-        process.stdout.write("\x1b[4m"+'｜ '+label+'\x1b[0m');
+        process.stdout.write('｜ '+label);
+        
     })
+    
     process.stdout.write("\n");
+    
+    //line at top of box
+    _.each(keys, function(l){
+        var s = '';
+        while(s.length <= l) s += '=';
+            process.stdout.write('==='+s);
+    }); 
+    process.stdout.write("=");
+    
     process.stdout.write("\n");
+    
     _.each(data, function(item){
         _.each(item, function(v, k){
             var s = String(v).trim().replace(/\n/g, ' ');
-            if(s.length > maxwidth){
+            if(maxwidth && s.length > maxwidth){
                 s = s.substring(0, maxwidth-5)+'...';
             }
             while(s.length <= keys[k]) s += ' ';
@@ -105,9 +132,20 @@ function printTable(data){
         process.stdout.write('｜'+"\n");
     });
     
-    var cd = 145  // should be dynamic
-    process.stdout.write(Array(cd).join("‾")+"\n");
+    // line at bottom of box
+    _.each(keys, function(l){
+        var s = '';
+        while(s.length <= l) s += '‾';
+            process.stdout.write('‾‾‾'+s);
+    }); 
+    
+   
+    process.stdout.write("‾");
     process.stdout.write("\n");
+    
+    
+            //TO VIEW DATA IN FULL LENGTH USE --MAX-WIDTH
+
     
     
 } 
