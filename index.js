@@ -15,7 +15,12 @@ var database = [],
 	password = '',
 	sqlfile = [],
 	statement = [],
-    maxwidth = 30;
+    
+    
+    maxwidth = (process.stdout.columns-105);
+
+
+
 
 for(var i = 2; i < args.length; i++){
 	switch(args[i]){
@@ -48,7 +53,6 @@ for(var i = 2; i < args.length; i++){
 	- file execute yazilacak
 		- file birden fazla sql icerebilir, GO ile ayrilmasi lazim
 	- eger database verilmedi ise versiyon controlu yapilmali.
-	
 */
 
 
@@ -61,6 +65,10 @@ for(var i = 2; i < args.length; i++){
 //	sqlfile: sqlfile,
 //	statement: statement
 //})
+
+
+
+
 
 
 // ***************************************************************
@@ -76,87 +84,120 @@ function printTable(data){
             var l = String(v).trim().length; if(l>maxwidth) l = maxwidth;
             if(typeof keys[k] === 'undefined') keys[k] = k.length+1;
             keys[k] = l > keys[k] ? l : keys[k];
-            
-             //   // to find the total length of the GUI
-             //   if (_.keys.length > 0) {    
-             //   var sumKeys = 12 + (select count(*) from information_schema.columns where table_name='article')
-             //       console.log(sumKeys)
-             //   }
         })
     });
+    
     
     //console.log(keys);
     
     process.stdout.write("\n");
+    process.stdout.write("\n");
+    
+    
+    
     
     // header line
      _.each(keys, function(l){
         var s = '';
-        while(s.length <= l) s += '‾';
-            process.stdout.write('‾‾‾'+s);
+        while(s.length <= l) s += '═';
+            process.stdout.write('══'+s);
     }); 
-    process.stdout.write("‾"); 
+    process.stdout.write("═");
     
     process.stdout.write("\n");
+    process.stdout.write("Max-width= "+maxwidth);
     process.stdout.write("\n");
     process.stdout.write("\n");
     process.stdout.write("\n");
-    _.each(keys, function(l, k){
-        var label = k;
-        while(label.length <= l) label += ' ';
-        process.stdout.write('｜ '+label);
-        
-    })
     
-    process.stdout.write("\n");
+      
+    
     
     //line at top of box
     _.each(keys, function(l){
         var s = '';
-        while(s.length <= l) s += '=';
-            process.stdout.write('==='+s);
+        while(s.length <= l) s += '═';
+            process.stdout.write('╤═'+s);
     }); 
-    process.stdout.write("=");
+    process.stdout.write("╗");
+        process.stdout.write("\n");
+
     
+    
+    
+    // category titles
+    _.each(keys, function(l, k){
+        var label = k;
+        while(label.length <= l) label += ' ';
+        process.stdout.write('│ '+'\x1b[1m'+label+'\x1b[0m');
+        
+    })
+    
+    process.stdout.write("│");
     process.stdout.write("\n");
     
+    
+    
+    
+    //line at bottom of category titles
+    _.each(keys, function(l){
+        var s = '';
+        while(s.length <= l) s += '═';
+            process.stdout.write('╪═'+s);
+    }); 
+    
+    process.stdout.write("╣");
+    process.stdout.write("\n");
+    
+    
+    
+    
+    // content
     _.each(data, function(item){
         _.each(item, function(v, k){
             var s = String(v).trim().replace(/\n/g, ' ');
             if(maxwidth && s.length > maxwidth){
-                s = s.substring(0, maxwidth-5)+'...';
+                s = s.substring(0, maxwidth-2)+"\x1b[1m"+'⋙  '+'\x1b[0m';
             }
             while(s.length <= keys[k]) s += ' ';
-            process.stdout.write('｜ '+s);    
+            process.stdout.write('│ '+s);    
         })
-        process.stdout.write('｜'+"\n");
+        process.stdout.write('│'+"\n");
     });
+    
+    
+    
     
     // line at bottom of box
     _.each(keys, function(l){
         var s = '';
-        while(s.length <= l) s += '‾';
-            process.stdout.write('‾‾‾'+s);
+        while(s.length <= l) s += '═';
+            process.stdout.write('╧═'+s);
     }); 
     
    
-    process.stdout.write("‾");
+    process.stdout.write("╝");
     process.stdout.write("\n");
     
     
-            //TO VIEW DATA IN FULL LENGTH USE --MAX-WIDTH
-
-    
-    
-} 
+}
 
 
-// ***************************************************************
+
+
+
+    //   TO VIEW DATA IN FULL LENGTH USE --MAX-WIDTH   
+
+
+
+
 
 
 
 function selectdb(dbname){
 	return function(callback){
+            process.stdout.write("\n");
+            process.stdout.write("\n");
 		console.log('\nDATABASE: '+dbname);
 		db = new mssql.Request(conn);
 		db.batch('USE '+dbname, callback);
@@ -165,7 +206,7 @@ function selectdb(dbname){
 
 function query(sql){
 	return function(callback){
-		console.log('query '+sql);
+		console.log('Query: '+sql);
 		db.query(sql, function(err, result){
 			if(!err) printTable(result);
 			callback(err, null);
@@ -187,6 +228,9 @@ function execute(file){
 	}
 }
 
+
+
+
 var conn, db;
 
 var JOBS = [
@@ -195,6 +239,7 @@ var JOBS = [
 		conn = new mssql.Connection({user: username, password: password, server: host}, callback);
 	}
 ];
+
 
 function setJobs(){
     database.forEach(function(dbname){
@@ -210,8 +255,6 @@ function setJobs(){
 
     })
 }
-
-
 
 
 setJobs();
