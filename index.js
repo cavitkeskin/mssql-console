@@ -133,7 +133,7 @@ function printTable(data){
         
     })
     
-    process.stdout.write("│");
+    process.stdout.write("║");
     process.stdout.write("\n");
     
     
@@ -162,7 +162,7 @@ function printTable(data){
             while(s.length <= keys[k]) s += ' ';
             process.stdout.write('│ '+s);    
         })
-        process.stdout.write('│'+"\n");
+        process.stdout.write('║'+"\n");
     });
     
     
